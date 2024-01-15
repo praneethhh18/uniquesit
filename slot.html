@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hall Booking</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            background: url('green.png'); /* Replace 'green.png' with your texture image */
+            background-size: cover;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 30px;
+            font-size: 36px;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        select,
+        input[type="date"],
+        input[type="time"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        #booking-status {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 8px;
+        }
+
+        #hall-images-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        /* Optional: Adding texture to the body background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: url('green.png'); /* Replace 'green.png' with your texture image */
+            opacity: 0.1;
+        }
+
+        /* New styles for booked slots */
+        #booked-slots {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 8px;
+        }
+
+        #booked-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #booked-list li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Hall Booking System</h1>
+
+    <!-- Booking Form -->
+    <form id="booking-form">
+        <label for="hall-select">Select Hall:</label>
+        <select id="hall-select" required>
+            <option value="">Choose...</option>
+            <option value="seminar-hall">Seminar Hall</option>
+            <option value="auditorium">Auditorium</option>
+            <option value="front-stage">Front Stage</option>
+            <option value="classroom">Classroom</option>
+        </select>
+
+        <!-- Classroom Input (displayed if Classroom is selected) -->
+        <div id="classroom-input" style="display: none;">
+            <label for="class-input">Class:</label>
+            <input type="text" id="class-input" name="class">
+        </div>
+
+        <label for="date-input">Enter Date:</label>
+        <input type="date" id="date-input" name="date" required>
+
+        <label for="time-input">Enter Time:</label>
+        <input type="time" id="time-input" name="time" required>
+
+        <label for="name-input">Your Name:</label>
+        <input type="text" id="name-input" name="name" required>
+
+        <label for="department-input">Select Department:</label>
+        <select id="department-input" required>
+            <option value="">Choose...</option>
+            <option value="ai_ml">Artificial Intelligence and Machine Learning</option>
+            <option value="ai_ds">Artificial Intelligence and Data Science</option>
+            <option value="cse">Computer Science and Engineering (CSE, CSD, CSBS)</option>
+            <option value="mechanical">Mechanical Engineering</option>
+            <option value="marine">Marine Engineering</option>
+            <option value="eee">Electrical and Electronics Engineering</option>
+            <option value="ece">Electronics and Communication</option>
+            <option value="ise">Information Science and Engineering</option>
+            <option value="aeronautical">Aeronautical Engineering</option>
+            <option value="automobile">Automobile Engineering</option>
+            <option value="others">Others</option>
+        </select>
+
+        <!-- Other Department Input (displayed if Others is selected) -->
+        <div id="other-department" style="display: none;">
+            <label for="other-department-input">Your Department:</label>
+            <input type="text" id="other-department-input" name="other-department">
+        </div>
+
+        <label for="contact-input">Contact Number:</label>
+        <input type="text" id="contact-input" name="contact" required>
+
+        <button type="submit">Book Hall</button>
+    </form>
+
+    <!-- Booking Status -->
+    <div id="booking-status">
+        <h2></h2>
+    </div>
+
+    <!-- Hall Images Link -->
+    <a href="hall-images.html" id="hall-images-link">View Hall Images</a>
+
+    <!-- Booked Slots Section -->
+    <div id="booked-slots">
+        <h2>Booked Slots</h2>
+        <ul id="booked-list"></ul>
+    </div>
+
+    <!-- Additional Script Section -->
+    <script>
+        document.getElementById('hall-select').addEventListener('change', function () {
+            // Show classroom input only if the selected hall is a classroom
+            var classroomInput = document.getElementById('classroom-input');
+            classroomInput.style.display = this.value === 'classroom' ? 'block' : 'none';
+        });
+
+        document.getElementById('department-input').addEventListener('change', function () {
+            // Show other department input only if "Others" is selected
+            var otherDepartmentInput = document.getElementById('other-department');
+            otherDepartmentInput.style.display = this.value === 'others' ? 'block' : 'none';
+        });
+
+        document.getElementById('booking-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var hallSelect = document.getElementById('hall-select');
+            var hallId = hallSelect.options[hallSelect.selectedIndex].value;
+
+            var dateInput = document.getElementById('date-input');
+            var date = dateInput.value;
+
+            var timeInput = document.getElementById('time-input');
+            var time = timeInput.value;
+
+            // Get the class input value
+            var classInput = document.getElementById('class-input');
+            var classroom = classInput ? classInput.value : '';
+
+            // Get user information
+            var nameInput = document.getElementById('name-input');
+            var name = nameInput.value;
+
+            var departmentSelect = document.getElementById('department-input');
+            var department = departmentSelect.options[departmentSelect.selectedIndex].value;
+
+            // Get other department input value if "Others" is selected
+            var otherDepartmentInput = document.getElementById('other-department-input');
+            var otherDepartment = otherDepartmentInput ? otherDepartmentInput.value : '';
+
+            // Get contact input value
+            var contactInput = document.getElementById('contact-input');
+            var contact = contactInput.value;
+
+            // Perform the booking logic here (e.g., check availability, update status)
+            var isBooked = checkBookingStatus(hallId, date, time, classroom);
+
+            // Update the booking status message
+            var bookingStatus = document.getElementById('booking-status');
+            if (isBooked) {
+                bookingStatus.querySelector('h2').textContent = 'Hall is booked.';
+            } else {
+                var bookingMessage = `Hall is available. Booking confirmed for ${hallId} on ${date} at ${time}.`;
+                if (classroom) {
+                    bookingMessage += ` Class: ${classroom}`;
+                }
+                bookingMessage += `\nBooked by ${name} from ${department}`;
+                if (department === 'others') {
+                    bookingMessage += ` (${otherDepartment})`;
+                }
+                bookingMessage += `. Contact: ${contact}`;
+                bookingStatus.querySelector('h2').textContent = bookingMessage;
+
+                // Update booked slots
+                updateBookedSlots(hallId, date, time, classroom, name, department, otherDepartment, contact);
+            }
+        });
+
+        function checkBookingStatus(hallId, date, time, classroom) {
+            // Implement your logic to check if the hall is already booked
+            // For simplicity, this example assumes the hall is always available
+            return false;
+        }
+
+        function updateBookedSlots(hallId, date, time, classroom, name, department, otherDepartment, contact) {
+            // Example: Append the booked slot to the list
+            var bookedList = document.getElementById('booked-list');
+            var listItem = document.createElement('li');
+            listItem.textContent = `Hall: ${hallId}, Date: ${date}, Time: ${time}, Class: ${classroom}, Booked by: ${name}, Department: ${department}, Other Department: ${otherDepartment}, Contact: ${contact}`;
+            bookedList.appendChild(listItem);
+        }
+    </script>
+</body>
+
+</html>
